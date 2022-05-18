@@ -37,32 +37,14 @@ public class LoginTests {
         driver.quit();
     }
 
-    //@Before
-    //public void setUp() {
-        //driver.get("https://staging.boltqr.com/");
-    //}
-
     @Test
     public void testLoginWithIncorrectData() {
         LoginPage loginPage = new LoginPage(driver, wait);
         loginPage.enterEmail("example@gmail.com");
         loginPage.enterPassword("pass");
         loginPage.clickOnLoginButton();
-       
-        //WebElement emailField = driver.findElement(By.id("email"));
-        //emailField.sendKeys("example@gmail.com");
-
-        //WebElement passwordField = driver.findElement(By.id("password"));
-        //passwordField.sendKeys("admin");
-
-        //WebElement loginButton = driver.findElement(By.name("submit"));
-        //loginButton.click();
 
         assertEquals("Urls don't match.", "https://staging.boltqr.com/login", driver.getCurrentUrl());
-
-        //String expectedErrorMessage = "Your login combination is invalid!";
-        //WebElement alertElement = wait.until(ExpectedConditions.visibilityOfElementLocated(By.className("alert-danger")));
-        //String actualErrorMessage = alertElement.getText();
         assertEquals("Error messages don't match", "Your login combination is invalid!", loginPage.getAlertMessageText());
     }
 
@@ -73,29 +55,9 @@ public class LoginTests {
         loginPage.clickOnLoginButton();
         DashboardPage dashboardPage = new DashboardPage(driver, wait);
 
-        //WebElement emailField = driver.findElement(By.id("email"));
-        //emailField.sendKeys("admin");
-
-        //WebElement passwordField = driver.findElement(By.id("password"));
-        //passwordField.sendKeys("admin");
-
-        //WebElement loginButton = driver.findElement(By.name("submit"));
-        //loginButton.click();
-
         assertEquals("Urls don't match.", "https://staging.boltqr.com/dashboard", driver.getCurrentUrl());
-
-        //String expectedAlertMessage = "Welcome back, Milomir! You've successfully logged in.";
-        //WebElement alertElement = wait.until(ExpectedConditions.visibilityOfElementLocated(By.className("alert-info")));
-        //String actualAlertMessage = alertElement.getText();
         assertEquals("Alert messages don't match", "Welcome back, Milomir! You've successfully logged in.", dashboardPage.getAlertMessageText());
-
-        //String expectedPageHeading = "Dashboard";
-        //String pageHeading = driver.findElement(By.tagName("h1")).getText();
         assertEquals("Page headings don't match", "Dashboard", dashboardPage.getPageHeadingText());
-
-        //WebElement sideBarFooterElement = driver.findElement(By.className("app-sidebar-footer"));
-        //sideBarFooterElement.click();
-        //sideBarFooterElement.findElement(By.linkText("Logout")).click();
 
         dashboardPage.logout();
     }
@@ -105,17 +67,7 @@ public class LoginTests {
 
         loginPage.clickOnLoginButton();
 
-
-       //WebElement emailField = driver.findElement(By.id("email"));
-        
-        //WebElement loginButton = driver.findElement(By.name("submit"));
-        //loginButton.click();
-
         assertEquals("Urls don't match.", "https://staging.boltqr.com/login", driver.getCurrentUrl());
-        
-
-        //String expectedValidationMessage = "Please fill out this field.";
-        //String actualValidationMessage = emailField.getAttribute("validationMessage");
         assertEquals("Validation messages don't match.", "Please fill out this field.", loginPage.getEmailFieldValidationMessage());
     }
 }

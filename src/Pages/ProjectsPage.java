@@ -32,7 +32,7 @@ public class ProjectsPage {
         this.driver = driver;
         this.wait = wait;
     }
-    
+
     public void clickOnProjectsLink() {
         driver.findElement(projectsLink).click();
     }

@@ -10,6 +10,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import Pages.DashboardPage;
 import Pages.HomePage;
 import Pages.LoginPage;
 import Pages.ProjectsPage;
@@ -34,18 +35,20 @@ public class ProjectsTests {
         loginPage.enterEmail("admin");
         loginPage.enterPassword("admin");
         loginPage.clickOnLoginButton();   
+        DashboardPage dashboardPage = new DashboardPage(driver, wait);
+        dashboardPage.clickOnProjectsLink();
         projectsPage = new ProjectsPage(driver, wait);
     }
 
-    // @AfterClass
-    // public static void tearDownClass() {
-    //     driver.quit();
-    // }
+    @AfterClass
+    public static void tearDownClass() {
+        driver.quit();
+    }
 
     @Test
     public void testCreatingProjectWithNameAndDefaultColor() {
         ProjectsPage projectsPage = new ProjectsPage(driver, wait);
-        projectsPage.clickOnProjectsLink();
+        
         projectsPage.clickOnCreateAProjectLink();
         projectsPage.enterNameToProject("Omar");
         projectsPage.clickOnCreateButton();
@@ -57,22 +60,18 @@ public class ProjectsTests {
     @Test
     public void testFilteringProjectsTableBySearchInputField() {
         
-        projectsPage.clickOnProjectsLink();
         projectsPage.clickOnCreateAProjectLink();
         projectsPage.enterNameToProject("Omar");
         projectsPage.clickOnCreateButton();
 
-        projectsPage.clickOnProjectsLink();
         projectsPage.clickOnCreateAProjectLink();
         projectsPage.enterNameToProject("Milomir");
         projectsPage.clickOnCreateButton();
 
-        projectsPage.clickOnProjectsLink();
         projectsPage.clickOnCreateAProjectLink();
         projectsPage.enterNameToProject("Sonja");
         projectsPage.clickOnCreateButton();
 
-        projectsPage.clickOnProjectsLink();
         projectsPage.clickOnCreateAProjectLink();
         projectsPage.enterNameToProject("Jelena");
         projectsPage.clickOnCreateButton();
