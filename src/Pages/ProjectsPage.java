@@ -23,7 +23,7 @@ public class ProjectsPage {
     private By resultsPerPageDropDownMenu = By.id("results_per_page");
     private By submitButton = By.name("submit");
     private By projectName = By.xpath("/html/body/div[2]/section/div[1]/main/div/div[2]/table/tbody/tr[1]/td[1]/a");
-    private By kebabDropDownMenu = By.className("btn btn-link text-secondary dropdown-toggle dropdown-toggle-simple");
+    private By kebabDropDownMenu = By.className("text-secondary");
     private By deleteOption = By.linkText("Delete");
     private By deleteProject = By.className("btn-danger");
 

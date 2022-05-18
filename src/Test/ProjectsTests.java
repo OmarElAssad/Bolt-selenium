@@ -37,10 +37,10 @@ public class ProjectsTests {
         projectsPage = new ProjectsPage(driver, wait);
     }
 
-    @AfterClass
-    public static void tearDownClass() {
-        driver.quit();
-    }
+    // @AfterClass
+    // public static void tearDownClass() {
+    //     driver.quit();
+    // }
 
     @Test
     public void testCreatingProjectWithNameAndDefaultColor() {
