@@ -1,60 +1,83 @@
-package Test;
+package test;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-import java.time.Duration;
+import java.util.List;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.support.ui.WebDriverWait;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.Select;
 
-import Pages.DashboardPage;
-import Pages.HomePage;
-import Pages.LoginPage;
-import Pages.ProjectsPage;
+import pages.DashboardPage;
+import pages.LoginPage;
+import pages.ProjectsPage;
 
-public class ProjectsTests {
+public class ProjectsTests extends BaseTest {
 
-    private static WebDriver driver;
-    private static WebDriverWait wait;
-    public static ProjectsPage projectsPage;
+    private static ProjectsPage projectsPage;
+    private static DashboardPage dashboardPage;
+    private static LoginPage loginPage;
 
-    @BeforeClass
-    public static void setUpClass() {
-        System.setProperty("webdriver.chrome.driver", "C:\\Users\\omar_\\Desktop\\Omar\\QA course\\Automation testing\\Workspace\\chromedriver.exe");
-        driver = new ChromeDriver();
-        wait = new WebDriverWait(driver, Duration.ofMillis(1000));
-        driver.manage().window().maximize();
-
-        driver.get("https://staging.boltqr.com/");
-        HomePage homePage = new HomePage(driver);
+    @Before
+    public void setUp() {
         homePage.clickOnSignInLink();
-        LoginPage loginPage = new LoginPage(driver, wait);
+
+        loginPage = new LoginPage(driver, wait);
         loginPage.enterEmail("admin");
         loginPage.enterPassword("admin");
-        loginPage.clickOnLoginButton();   
-        DashboardPage dashboardPage = new DashboardPage(driver, wait);
+        loginPage.clickOnLoginButton();  
+
+        dashboardPage = new DashboardPage(driver, wait);
         dashboardPage.clickOnProjectsLink();
+
         projectsPage = new ProjectsPage(driver, wait);
     }
 
-    @AfterClass
-    public static void tearDownClass() {
-        driver.quit();
-    }
+    // @After
+    // public void tearDown() {
+    //     dashboardPage.logout();
+    // }
+
+    // @Test
+    // public void testDeleteAllProjects() {
+    //     projectsPage.deleteAllProjects();
+    // }
 
     @Test
-    public void testCreatingProjectWithNameAndDefaultColor() {
-        ProjectsPage projectsPage = new ProjectsPage(driver, wait);
+    public void testValidCreationOfProjectWithChangeOfColor() {
         
         projectsPage.clickOnCreateAProjectLink();
         projectsPage.enterNameToProject("Omar");
+        projectsPage.changeColorForProject();
         projectsPage.clickOnCreateButton();
 
         assertEquals("Urls don't match", "https://staging.boltqr.com/projects", driver.getCurrentUrl());
         assertEquals("Alert messages don't match", "Omar has been successfully created.", projectsPage.getAlertMessageText());
+    }
+
+    @Test
+    public void testInvalidCreationOfProjectWithNoName() {
+        projectsPage.clickOnCreateAProjectLink();
+        projectsPage.clickOnCreateButton();
+        projectsPage.getProjectNameValidationMessag();
+
+        assertEquals("Urls don't match.", "https://staging.boltqr.com/project-create", driver.getCurrentUrl());
+        assertEquals("Validation message don't match.", "Please fill out this field.", projectsPage.getProjectNameValidationMessag());
+    }
+
+    @Test
+    public void testDeletingAProject() {
+
+        projectsPage.clickOnCreateAProjectLink();
+        projectsPage.enterNameToProject("Omar");
+        projectsPage.clickOnCreateButton();
+
+        projectsPage.deleteProject();
+
+        assertEquals("Alert messages don't match", "Omar has been successfully deleted.", projectsPage.getAlertMessageText());
     }
 
     @Test
@@ -78,85 +101,69 @@ public class ProjectsTests {
 
         projectsPage.clickOnFilterButton();
         projectsPage.enterSearchInput("Jelena");
-        projectsPage.clickOnSubmitButton();
-
-        assertEquals("Names don't match", "Jelena", projectsPage.getProjectName());
-
-        projectsPage.clickOnProjectsLink();
-
-        assertEquals("Urls don't match", "https://staging.boltqr.com/projects", driver.getCurrentUrl());
-
-        projectsPage.clickOnKebabDropDownMenu();
-        projectsPage.clickOnDeleteOption();
-        projectsPage.clickOnDeleteProject();
-
-        projectsPage.clickOnKebabDropDownMenu();
-        projectsPage.clickOnDeleteOption();
-        projectsPage.clickOnDeleteProject();
-
-        projectsPage.clickOnKebabDropDownMenu();
-        projectsPage.clickOnDeleteOption();
-        projectsPage.clickOnDeleteProject();
-
-        projectsPage.clickOnKebabDropDownMenu();
-        projectsPage.clickOnDeleteOption();
-        projectsPage.clickOnDeleteProject();
+        projectsPage.clickOnFilterSubmitButton();
+        
+        List<String> projectNames = projectsPage.getNamesOfProjects();
+        for (String name : projectNames) {
+            assertTrue("Doesn't contain search value", name.contains("Jelena"));
+        }
     }
+
+    @Test
+    public void testReorderingProjectsTableWithOrderByName() {
+        projectsPage.clickOnCreateAProjectLink();
+        projectsPage.enterNameToProject("Omar");
+        projectsPage.clickOnCreateButton();
+
+        projectsPage.clickOnCreateAProjectLink();
+        projectsPage.enterNameToProject("Milomir");
+        projectsPage.clickOnCreateButton();
+
+        assertEquals("First project names don't match.", "Omar", projectsPage.getFirstProjectNameBeforeFilter());
+        
+        
+        projectsPage.clickOnFilterButton();
+        projectsPage.clickOnOrderByDropDownMenu();
+        projectsPage.clickOnOrderByName();
+        projectsPage.clickOnFilterSubmitButton();
+
+        assertEquals("Names don't match", "Milomir", projectsPage.getFirstProjectNameAfterFilter());
+    }
+
+    @Test
+    public void testResultsPerPage() {
+        projectsPage.clickOnCreateAProjectLink();
+        projectsPage.enterNameToProject("Omar");
+        projectsPage.clickOnCreateButton();
+
+        projectsPage.clickOnCreateAProjectLink();
+        projectsPage.enterNameToProject("Milomir");
+        projectsPage.clickOnCreateButton();
+
+        projectsPage.clickOnCreateAProjectLink();
+        projectsPage.enterNameToProject("Sonja");
+        projectsPage.clickOnCreateButton();
+
+        projectsPage.clickOnCreateAProjectLink();
+        projectsPage.enterNameToProject("Jelena");
+        projectsPage.clickOnCreateButton();
+
+        projectsPage.clickOnFilterButton();
+        projectsPage.clickOnResultsPerPageDropDownMenu();
+
+        WebElement selectElement = driver.findElement(By.id("results_per_page"));
+        Select selectObject = new Select(selectElement);
+        selectObject.selectByIndex(5);
+
+        projectsPage.clickOnFilterSubmitButton();
+
+        assertEquals("Values don't match", "500", projectsPage.getResultsPerPageValue());
+    }
+    
+
+
 }
 
 
-    // public static void main(String[] args) throws Exception {
-    //     System.setProperty("webdriver.chrome.driver", "C:\\Users\\omar_\\Desktop\\Omar\\QA course\\Automation testing\\Workspace\\chromedriver.exe");
-    //     WebDriver driver = new ChromeDriver();
-    //     driver.manage().window().maximize();
 
-    //     driver.get("https://staging.boltqr.com/");
 
-    //     WebElement singinButton = driver.findElement(By.linkText("Sign in"));
-    //     singinButton.click();
-
-    //     WebElement emailField = driver.findElement(By.id("email"));
-    //     emailField.sendKeys("admin");
-
-    //     WebElement passwordField = driver.findElement(By.id("password"));
-    //     passwordField.sendKeys("admin");
-
-    //     WebElement loginButton = driver.findElement(By.name("submit"));
-    //     loginButton.click();
-
-    //     WebElement projectsLink = driver.findElement(By.xpath("/html/body/div[2]/div/div[2]/ul/li[5]/a"));
-    //     projectsLink.click();
-
-    //     WebDriverWait wait = new WebDriverWait(driver, Duration.ofMillis(600));
-    //     WebElement createProjectButton = wait.until(ExpectedConditions.visibilityOfElementLocated(By.linkText("Create project")));
-    //     createProjectButton.click();
-
-    //     WebElement projectNameInput = driver.findElement(By.id("name"));
-    //     projectNameInput.sendKeys("QA test");
-
-    //     WebElement createButton = driver.findElement(By.name("submit"));
-    //     createButton.click();
-
-    //     WebElement alertMessage = wait.until(ExpectedConditions.visibilityOfElementLocated(By.className("alert-success")));
-
-    //     WebElement projectName = driver.findElement(By.linkText("QA test"));
-
-    //     String expectedUrl = "https://staging.boltqr.com/projects";
-    //     String actualUrl = driver.getCurrentUrl();
-
-    //     String expectedAlertMessage = "QA test has been successfully created.";
-    //     String actualAlertMessage = alertMessage.getText();
-
-    //     String expectedProjectName = "QA test";
-    //     String actualProjectName = projectName.getText();
-
-    //     if (expectedUrl.equals(actualUrl) && expectedAlertMessage.equals(actualAlertMessage) && expectedProjectName.equals(actualProjectName)) {
-    //         System.out.println("Test passed.");
-    //     } else {
-    //         System.out.println("Test failed.");
-    //     }
-
-    //     driver.quit();
-
-    // }
-//}

@@ -1,45 +1,29 @@
-package Test;
+package test;
 import static org.junit.Assert.assertEquals;
 
-import java.time.Duration;
-
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.support.ui.WebDriverWait;
 
-import Pages.DashboardPage;
-import Pages.HomePage;
-import Pages.LoginPage;
+import pages.DashboardPage;
+import pages.LoginPage;
 
-public class LoginTests {
-    private static WebDriver driver;
-    private static WebDriverWait wait;
-    public static LoginPage loginPage;
+public class LoginTests extends BaseTest {
+    private static LoginPage loginPage;
 
-    @BeforeClass
-    public static void setUpClass() {
-        System.setProperty("webdriver.chrome.driver", "C:\\Users\\omar_\\Desktop\\Omar\\QA course\\Automation testing\\Workspace\\chromedriver.exe");
-        driver = new ChromeDriver();
-        wait = new WebDriverWait(driver, Duration.ofMillis(1000));
-        driver.manage().window().maximize();
-
-        driver.get("https://staging.boltqr.com/");
-        HomePage homePage = new HomePage(driver);
+    @Before
+    public void setUp() {
         homePage.clickOnSignInLink();
         loginPage = new LoginPage(driver, wait);
     }
 
-    @AfterClass
-    public static void tearDownClass() {
-        driver.quit();
+    @After
+    public void tearDown() {
+        driver.get("https://staging.boltqr.com/");
     }
 
     @Test
     public void testLoginWithIncorrectData() {
-        LoginPage loginPage = new LoginPage(driver, wait);
         loginPage.enterEmail("example@gmail.com");
         loginPage.enterPassword("pass");
         loginPage.clickOnLoginButton();
