@@ -6,9 +6,11 @@ import java.util.List;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 public class ProjectsPage {
@@ -18,22 +20,17 @@ public class ProjectsPage {
 
     private By projectsLink = By.xpath("/html/body/div[2]/div/div[2]/ul/li[5]/a");
 
-    private By header2 = By.tagName("h2");
-
     private By createProjectLink = By.className("btn-primary");
     private By nameTheProject = By.id("name");
     private By createButton = By.name("submit");
     private By alertmessage = By.className("alert-success");
+    private By projectName = By.xpath("/html/body/div[2]/section/div[1]/main/div/div[3]/table/tbody/tr[1]/td[1]/a");
 
     private By filterButton = By.className("filters-button");
 
     private By searchInputField = By.id("search");
 
-    private By searchByDropDownMenu = By.id("search_by");
-
     private By orderByDropDownMenu = By.id("order_by");
-    private By orderByCreatedDateTime = By.xpath("//*[@id='order_by']/option[1]");
-    private By orderByName = By.xpath("//*[@id='order_by']/option[2]");
 
     private By orderTypeDropDownMenu = By.id("order_type");
 
@@ -41,12 +38,8 @@ public class ProjectsPage {
 
     private By filterSubmitButton = By.name("submit");
 
-    private By projectName = By.xpath("/html/body/div[2]/section/div[1]/main/div/div[2]/table/tbody/tr/td[1]/a");
-
-    private By firstProjectNameBeforeFilter = By.xpath("/html/body/div[2]/section/div[1]/main/div/div[3]/table/tbody/tr[1]/td[1]/a");
-    private By firstProjectNameAfterFilter = By.xpath("/html/body/div[2]/section/div[1]/main/div/div[2]/table/tbody/tr[1]/td[1]/a");
-
     private By kebabDropDownMenu = By.className("text-secondary");
+    private By editOption = By.linkText("Edit");
     private By deleteOption = By.linkText("Delete");
     private By deleteProject = By.className("btn-danger");
 
@@ -59,6 +52,8 @@ public class ProjectsPage {
     public void clickOnProjectsLink() {
         driver.findElement(projectsLink).click();
     }
+
+    // Methods for creating a project, and validating the changes
 
     public void clickOnCreateAProjectLink() {
         wait.until(ExpectedConditions.visibilityOfElementLocated(createProjectLink)).click();
@@ -86,57 +81,7 @@ public class ProjectsPage {
         return wait.until(ExpectedConditions.visibilityOfElementLocated(alertmessage)).getText();
     }
 
-    public void clickOnFilterButton() {
-        wait.until(ExpectedConditions.visibilityOfElementLocated(filterButton)).click();
-    }
-
-    public void enterSearchInput(String searchInput) {
-        driver.findElement(searchInputField).sendKeys(searchInput);
-    }
-
-    public void clickOnSearchByDropDownMenu() {
-        driver.findElement(searchByDropDownMenu).click();
-    }
-
-    public void clickOnOrderByDropDownMenu() {
-        driver.findElement(orderByDropDownMenu).click();
-    }
-
-    public void clickOnOrderByCreatedDateName() {
-        driver.findElement(orderByCreatedDateTime).click();
-    }
-
-    public void clickOnOrderByName() {
-        driver.findElement(orderByName).click();
-    }
-
-    public void clickOnOrderTypeDropDownMenu() {
-        driver.findElement(orderTypeDropDownMenu).click();
-    }
-
-    public void clickOnResultsPerPageDropDownMenu() {
-        driver.findElement(resultsPerPageDropDownMenu).click();
-    }
-
-    public String getResultsPerPageValue() {
-        return driver.findElement(By.xpath("//*[@id='results_per_page']")).getAttribute("value");
-    }
-        
-    public void clickOnFilterSubmitButton() {
-        driver.findElement(filterSubmitButton).click();
-    }
-
-    public String getProjectName() {
-        return driver.findElement(projectName).getText();
-    }
-
-    public String getFirstProjectNameBeforeFilter() {
-        return driver.findElement(firstProjectNameBeforeFilter).getText();
-    }
-
-    public String getFirstProjectNameAfterFilter() {
-        return driver.findElement(firstProjectNameAfterFilter).getText();
-    }
+    // Methods for testing the Kebab dropdown menu for the created project (Edit & Delete options)
 
     public void clickOnKebabDropDownMenu() {
         wait.until(ExpectedConditions.visibilityOfElementLocated(kebabDropDownMenu)).click();
@@ -149,11 +94,48 @@ public class ProjectsPage {
     public void clickOnDeleteProject() {
         wait.until(ExpectedConditions.visibilityOfElementLocated(deleteProject)).click();
     }
-    
+
+    public void clickOnEditOption() {
+        wait.until(ExpectedConditions.visibilityOfElementLocated(editOption)).click();
+    }
+
+    public void changeProjectName(String name) {
+        driver.findElement(By.id("name")).sendKeys(Keys.chord(Keys.CONTROL, "a", Keys.DELETE), (name));
+    }
+
+    public String getProjectName() {
+        return driver.findElement(projectName).getText();
+    }
+
     public void deleteProject() {
         clickOnKebabDropDownMenu();
         clickOnDeleteOption();
         clickOnDeleteProject();
+    }
+
+    public void deleteAllProjects() {
+        do {
+            deleteProject();
+        } while (getProjectName() != null);
+            
+    }
+
+
+    // Methods for filtering the projects table, and their validation methods
+
+    public void clickOnFilterButton() {
+        wait.until(ExpectedConditions.visibilityOfElementLocated(filterButton)).click();
+    }
+
+    public void clickOnFilterSubmitButton() {
+        driver.findElement(filterSubmitButton).click();
+    }
+
+
+    // Search input field
+
+    public void enterSearchInput(String searchInput) {
+        driver.findElement(searchInputField).sendKeys(searchInput);
     }
 
     public List<String> getNamesOfProjects() {
@@ -167,14 +149,55 @@ public class ProjectsPage {
         return projectNames;
     }
 
-    public void deleteAllProjects() {
-        do {
-            deleteProject();
-        } while (getFirstProjectNameBeforeFilter() != null);
 
+    // Order By
+
+    public void clickOnOrderByDropDownMenu() {
+        driver.findElement(orderByDropDownMenu).click();
     }
 
-    public String getHeader2() {
-        return wait.until(ExpectedConditions.visibilityOfElementLocated(header2)).getText();
+    public void enterOrderByIndexValue(int index) {
+        WebElement selectElement = driver.findElement(By.id("order_by"));
+        Select selectObject = new Select(selectElement);
+        selectObject.selectByIndex(index);
     }
+
+    public String getOrderByAttributeValue() {
+        return driver.findElement(By.xpath("//*[@id='order_by']")).getAttribute("value");
+    }
+
+
+    // Order Type
+
+    public void clickOnOrderTypeDropDownMenu() {
+        driver.findElement(orderTypeDropDownMenu).click();
+    }
+
+    public void enterOrderTypeIndexValue(int index) {
+        WebElement selectElement = driver.findElement(By.id("order_type"));
+        Select selectObject = new Select(selectElement);
+        selectObject.selectByIndex(index);
+    }
+
+    public String getOrderTypeAttributeValue() {
+        return driver.findElement(By.xpath("//*[@id='order_type']")).getAttribute("value");
+    }
+
+
+    // Results per page
+
+    public void clickOnResultsPerPageDropDownMenu() {
+        driver.findElement(resultsPerPageDropDownMenu).click();
+    }
+
+    public void enterResultsPerPageIndexValue(int index) {
+        WebElement selectElement = driver.findElement(By.id("results_per_page"));
+        Select selectObject = new Select(selectElement);
+        selectObject.selectByIndex(index);
+    }
+
+    public String getResultsPerPageAttributeValue() {
+        return driver.findElement(By.xpath("//*[@id='results_per_page']")).getAttribute("value");
+    }
+        
 }

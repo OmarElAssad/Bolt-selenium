@@ -34,8 +34,8 @@ public class BaseTest {
         driver.get("https://staging.boltqr.com/");   
     }
 
-    // @AfterClass
-    // public static void tearDownClass() {
-    //     driver.quit();
-    // }
+    @AfterClass
+    public static void tearDownClass() {
+        driver.quit();
+    }
 }

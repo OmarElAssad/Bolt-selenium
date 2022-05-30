@@ -7,9 +7,6 @@ import java.util.List;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.Select;
 
 import pages.DashboardPage;
 import pages.LoginPage;
@@ -36,10 +33,12 @@ public class ProjectsTests extends BaseTest {
         projectsPage = new ProjectsPage(driver, wait);
     }
 
-    // @After
-    // public void tearDown() {
-    //     dashboardPage.logout();
-    // }
+    @After
+    public void tearDown() {
+        dashboardPage.logout();
+    }
+
+    /* The delete all projects method is for your convenience, to be used if needed after conducting multiple tests */
 
     // @Test
     // public void testDeleteAllProjects() {
@@ -81,7 +80,27 @@ public class ProjectsTests extends BaseTest {
     }
 
     @Test
-    public void testFilteringProjectsTableBySearchInputField() {
+    public void testEditingAProjectByChangingName() {
+        projectsPage.clickOnCreateAProjectLink();
+        projectsPage.enterNameToProject("Test");
+        projectsPage.changeColorForProject();
+        projectsPage.clickOnCreateButton();
+
+        assertEquals("Urls don't match", "https://staging.boltqr.com/projects", driver.getCurrentUrl());
+        assertEquals("Alert messages don't match", "Test has been successfully created.", projectsPage.getAlertMessageText());
+
+        projectsPage.clickOnKebabDropDownMenu();
+        projectsPage.clickOnEditOption();
+        projectsPage.changeProjectName("qa test");
+        projectsPage.clickOnCreateButton();
+
+        assertEquals("Alert messages don't match", "qa test has been successfully updated.", projectsPage.getAlertMessageText());
+
+        projectsPage.clickOnProjectsLink();
+    }
+
+    @Test
+    public void testSearchInputFieldFilter() {
         
         projectsPage.clickOnCreateAProjectLink();
         projectsPage.enterNameToProject("Omar");
@@ -110,7 +129,7 @@ public class ProjectsTests extends BaseTest {
     }
 
     @Test
-    public void testReorderingProjectsTableWithOrderByName() {
+    public void testOrderByFilter() {
         projectsPage.clickOnCreateAProjectLink();
         projectsPage.enterNameToProject("Omar");
         projectsPage.clickOnCreateButton();
@@ -119,19 +138,53 @@ public class ProjectsTests extends BaseTest {
         projectsPage.enterNameToProject("Milomir");
         projectsPage.clickOnCreateButton();
 
-        assertEquals("First project names don't match.", "Omar", projectsPage.getFirstProjectNameBeforeFilter());
-        
+        projectsPage.clickOnCreateAProjectLink();
+        projectsPage.enterNameToProject("Sonja");
+        projectsPage.clickOnCreateButton();
+
+        projectsPage.clickOnCreateAProjectLink();
+        projectsPage.enterNameToProject("Jelena");
+        projectsPage.clickOnCreateButton();
         
         projectsPage.clickOnFilterButton();
         projectsPage.clickOnOrderByDropDownMenu();
-        projectsPage.clickOnOrderByName();
+        projectsPage.enterOrderByIndexValue(1);
+
         projectsPage.clickOnFilterSubmitButton();
 
-        assertEquals("Names don't match", "Milomir", projectsPage.getFirstProjectNameAfterFilter());
+        assertEquals("Names don't match", "name", projectsPage.getOrderByAttributeValue());
     }
 
     @Test
-    public void testResultsPerPage() {
+    public void testOrderTypeFilter() {
+        
+        projectsPage.clickOnCreateAProjectLink();
+        projectsPage.enterNameToProject("1");
+        projectsPage.clickOnCreateButton();
+
+        projectsPage.clickOnCreateAProjectLink();
+        projectsPage.enterNameToProject("2");
+        projectsPage.clickOnCreateButton();
+
+        projectsPage.clickOnCreateAProjectLink();
+        projectsPage.enterNameToProject("3");
+        projectsPage.clickOnCreateButton();
+
+        projectsPage.clickOnCreateAProjectLink();
+        projectsPage.enterNameToProject("4");
+        projectsPage.clickOnCreateButton();
+
+        projectsPage.clickOnFilterButton();
+        projectsPage.clickOnOrderTypeDropDownMenu();
+        projectsPage.enterOrderTypeIndexValue(1);
+
+        projectsPage.clickOnFilterSubmitButton();
+
+        assertEquals("Names don't match", "DESC", projectsPage.getOrderTypeAttributeValue());
+    }
+
+    @Test
+    public void testResultsPerPageFilter() {
         projectsPage.clickOnCreateAProjectLink();
         projectsPage.enterNameToProject("Omar");
         projectsPage.clickOnCreateButton();
@@ -150,18 +203,13 @@ public class ProjectsTests extends BaseTest {
 
         projectsPage.clickOnFilterButton();
         projectsPage.clickOnResultsPerPageDropDownMenu();
-
-        WebElement selectElement = driver.findElement(By.id("results_per_page"));
-        Select selectObject = new Select(selectElement);
-        selectObject.selectByIndex(5);
+        projectsPage.enterResultsPerPageIndexValue(5);
 
         projectsPage.clickOnFilterSubmitButton();
 
-        assertEquals("Values don't match", "500", projectsPage.getResultsPerPageValue());
+        assertEquals("Values don't match", "500", projectsPage.getResultsPerPageAttributeValue());
     }
     
-
-
 }
 
 
